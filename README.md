@@ -3,15 +3,26 @@
 AviUtl ExEdit2（AviUtl2）を起動するときに、**前回開いていたプロジェクト（.aup2）を自動で開く**ランチャです。
 
 AviUtl2 本体には「起動時に前回のプロジェクトを開く」設定がないので、外側から補います。
-AviUtl2 本体や設定ファイルには一切書き込みません。
+AviUtl2 本体や、AviUtl2 の設定ファイルには一切書き込みません。
 
 ## 使い方
 
+### AviUtl2 カタログから入れる（おすすめ）
+
+1. [AviUtl2 カタログ](https://github.com/Neosku/aviutl2-catalog) で「前回のプロジェクトを開く」をインストールします。
+2. スタートメニューに **「AviUtl2（前回のプロジェクトを開く）」** ができるので、そこから起動します。
+
+タスクバーにピン留めしておくと、普段の起動をこれに置き換えられます。
+アンインストールすると、スタートメニューのショートカットも消えます。
+
+### 手動で入れる
+
 1. [Releases](../../releases) から zip をダウンロードして展開します。
 2. `aviutl2-open-last.exe` を `aviutl2.exe` と同じフォルダに置きます。
-3. `aviutl2-open-last.exe` を起動すると、前回のプロジェクトを開いた状態で AviUtl2 が立ち上がります。
+3. `aviutl2-open-last.exe` を起動します。
 
-普段の起動をこれに置き換えたいときは、`aviutl2-open-last.exe` をタスクバーやスタートにピン留めしてください。
+`aviutl2.exe` と同じフォルダに置けない場合は、下の `--set-app` で AviUtl2 の場所を教えてください。
+
 何も開かずに起動したいときは、今まで通り `aviutl2.exe` を直接起動すれば大丈夫です。
 
 ## 仕組み
@@ -38,14 +49,28 @@ AviUtl2 は最近開いたプロジェクトを `history.ini` の `[project]` �
 
 ### `aviutl2.exe` の探し方
 
-ランチャ自身の場所から、次の順に探します。
+次の順に探します。
 
-1. 同じフォルダ
-2. `..\AviUtl2\aviutl2.exe`
-3. `..\aviutl2.exe`
-4. `..\..\AviUtl2\aviutl2.exe`
+1. `--set-app` で記録した場所（ランチャと同じフォルダの `aviutl2-open-last.ini`）
+2. ランチャと同じフォルダ
+3. `..\AviUtl2\aviutl2.exe`
+4. `..\aviutl2.exe`
+5. `..\..\AviUtl2\aviutl2.exe`
 
 見つからないときはエラーを表示して終了します。
+
+## コマンドライン
+
+| 引数 | 動作 |
+|---|---|
+| （なし） | AviUtl2 を起動して、前回のプロジェクトを開く |
+| `--set-app "<フォルダ>"` | `aviutl2.exe` のあるフォルダを記録し、スタートメニューにショートカットを作る |
+| `--uninstall` | 記録とショートカットを消す |
+
+`--set-app` と `--uninstall` は画面を出さずに終わります。終了コードは次のとおりです。
+0 = 成功 / 1 = 引数が不正 / 2 = 指定したフォルダに `aviutl2.exe` が無い / 3 = 記録に失敗 / 4 = ショートカットの作成に失敗。
+
+AviUtl2 カタログは、インストール時に `--set-app` を、アンインストール時に `--uninstall` を呼んでいます。
 
 ## 動作環境
 
@@ -57,7 +82,7 @@ AviUtl2 は最近開いたプロジェクトを `history.ini` の `[project]` �
 MinGW-w64 の gcc で `build.bat` を実行するか、次のコマンドでビルドできます。
 
 ```
-gcc -O2 -s -municode -mwindows -finput-charset=UTF-8 -fwide-exec-charset=UTF-16LE -o aviutl2-open-last.exe aviutl2-open-last.c -lshlwapi
+gcc -O2 -s -municode -mwindows -finput-charset=UTF-8 -fwide-exec-charset=UTF-16LE -o aviutl2-open-last.exe aviutl2-open-last.c -lshlwapi -lole32 -luuid
 ```
 
 `-mwindows` を外して `-DTESTMAIN` を付けると、履歴の読み取り結果だけを表示するコンソール版になります
@@ -71,6 +96,11 @@ test.exe "<aviutl2.exe のあるフォルダ>"
 
 - 非公式のツールです。AviUtl2 の作者様とは関係ありません。
 - `history.ini` の形式は AviUtl2 の内部仕様なので、今後のバージョンで変わる可能性があります。
+
+## 更新履歴
+
+- **v1.1.0** — AviUtl2 カタログに対応。`--set-app` / `--uninstall` を追加し、スタートメニューにショートカットを作るようにした。
+- **v1.0.0** — 最初の公開版。
 
 ## ライセンス
 
